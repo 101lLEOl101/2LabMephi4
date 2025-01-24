@@ -1,0 +1,19 @@
+# ninja log v6
+9	484	1737714954420714201	CMakeFiles/2LabMephi4.dir/visualisation.cpp.o	f4b2dc0e8d416767
+2	113	1737697021366302329	CMakeFiles/2LabMephi4.dir/imgui/backends/imgui_impl_opengl3.cpp.o	ec08294bb1e524ed
+1	479	1737697021365698453	CMakeFiles/2LabMephi4.dir/imgui/imgui_widgets.cpp.o	c5da733144bba73d
+25	62	1737714830406916073	CMakeFiles/2LabMephi4.dir/main.cpp.o	dd7178212f3aaaea
+1	339	1737697021365566328	CMakeFiles/2LabMephi4.dir/imgui/imgui_draw.cpp.o	9feb19961b136088
+10	391	1737714954421907281	CMakeFiles/2LabMephi4.dir/Graph.cpp.o	8bda8aa5930e0f29
+3	64	1737715067205440748	build.ninja	7105a4a1f65be8a7
+2	396	1737697021366421454	CMakeFiles/2LabMephi4.dir/imgui/examples/libs/gl3w/GL/gl3w.c.o	d7aac8c9bc4c596f
+2	354	1737697021366180995	CMakeFiles/2LabMephi4.dir/imgui/backends/imgui_impl_glfw.cpp.o	b88810401678a8e6
+1	551	1737697021365333953	CMakeFiles/2LabMephi4.dir/imgui/imgui.cpp.o	d268e34049606aaf
+1	252	1737697021365891745	CMakeFiles/2LabMephi4.dir/imgui/imgui_tables.cpp.o	5c34b35b98d4e5bb
+1	377	1737697021366047287	CMakeFiles/2LabMephi4.dir/imgui/imgui_demo.cpp.o	4df09f199407dd9a
+484	527	1737714954896158598	2LabMephi4	d7012a607cdc36ff
+10	424	1737714954422082698	CMakeFiles/2LabMephi4.dir/test.cpp.o	507c9f4da83f5d4a
+27	453	1737715193335791917	CMakeFiles/2LabMephi4.dir/Graph.cpp.o	8bda8aa5930e0f29
+28	494	1737715193335983542	CMakeFiles/2LabMephi4.dir/test.cpp.o	507c9f4da83f5d4a
+27	569	1737715193335158585	CMakeFiles/2LabMephi4.dir/visualisation.cpp.o	f4b2dc0e8d416767
+726	776	1737715194034641154	2LabMephi4	d7012a607cdc36ff

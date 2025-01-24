@@ -1,0 +1,3 @@
+/Users/lenyakuchuk/CLionProjects/2LabMephi4/cmake-build-debug/CMakeFiles/2LabMephi4.dir
+/Users/lenyakuchuk/CLionProjects/2LabMephi4/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/lenyakuchuk/CLionProjects/2LabMephi4/cmake-build-debug/CMakeFiles/rebuild_cache.dir
