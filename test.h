@@ -3,4 +3,4 @@
 
 void test();
 
-#endif //INC_2LABMEPHI4_TEST_H
+#endif

@@ -3,29 +3,62 @@
 #include <vector>
 #include <imgui.h>
 #include <cmath>
-#include <list>
+#include <iostream>
+
 class Graph {
 private:
     int V;
-    std::vector<std::list<int>> matrix;
+    std::vector<std::vector<int>> matrix;
 
 public:
     Graph(int V) {
-        assert(V > 0);  // Проверка на корректность числа вершин
         this->V = V;
         matrix.resize(V);
     }
 
+    Graph(int vertexCount, int edgeCount) {
+        if (edgeCount > vertexCount * (vertexCount - 1) / 2) {
+            edgeCount = vertexCount * (vertexCount - 1) / 2;
+        }
+
+        this->V = vertexCount;
+        matrix.resize(V);
+
+        std::vector<std::pair<int, int>> possibleEdges;
+        for (int i = 0; i < V; ++i) {
+            for (int j = i + 1; j < V; ++j) {
+                possibleEdges.emplace_back(i, j);
+            }
+        }
+
+        std::srand(static_cast<unsigned>(std::time(nullptr)));
+
+        for (int i = 0; i < edgeCount; ++i) {
+            int randomIndex = std::rand() % possibleEdges.size();
+            auto edge = possibleEdges[randomIndex];
+
+            addEdge(edge.first, edge.second);
+
+            possibleEdges.erase(possibleEdges.begin() + randomIndex);
+        }
+    }
+
     void addEdge(int v, int w) {
-        assert(v >= 0 && v < V && w >= 0 && w < V);  // Проверка индексов
+        if (v >= V || w >= V || v < 0 || w < 0) return; // Check for valid vertices
         matrix[v].push_back(w);
         matrix[w].push_back(v);
     }
 
     void removeEdge(int v, int w) {
-        assert(v >= 0 && v < V && w >= 0 && w < V);  // Проверка индексов
-        matrix[v].remove(w);
-        matrix[w].remove(v);
+        auto it = std::find(matrix[v].begin(), matrix[v].end(), w);
+        if (it != matrix[v].end()) {
+            matrix[v].erase(it);
+        }
+
+        it = std::find(matrix[w].begin(), matrix[w].end(), v);
+        if (it != matrix[w].end()) {
+            matrix[w].erase(it);
+        }
     }
 
     void addVertex() {
@@ -34,9 +67,11 @@ public:
     }
 
     void removeVertex(int v) {
-        assert(v >= 0 && v < V);  // Проверка индекса вершины
         for (int i = 0; i < V; ++i) {
-            matrix[i].remove(v);
+            auto it = std::find(matrix[i].begin(), matrix[i].end(), v);
+            if (it != matrix[i].end()) {
+                matrix[i].erase(it);
+            }
         }
         matrix.erase(matrix.begin() + v);
         V--;
@@ -51,7 +86,6 @@ public:
     }
 
     bool hasEdge(int v, int w) {
-        assert(v >= 0 && v < V && w >= 0 && w < V);  // Проверка индексов
         for (const auto& neighbor : matrix[v]) {
             if (neighbor == w) {
                 return true;
@@ -62,6 +96,29 @@ public:
 
     int vertexCount() const {
         return V;
+    }
+
+    std::vector<int> colorGraph() {
+        std::vector<int> color(V, -1);
+        color[0] = 0;
+
+        for (int u = 1; u < V; ++u) {
+            std::vector<bool> available(V, true);
+
+            for (const int& neighbor : matrix[u]) {
+                if (color[neighbor] != -1) {
+                    available[color[neighbor]] = false;
+                }
+            }
+
+            for (int c = 0; c < V; ++c) {
+                if (available[c]) {
+                    color[u] = c;
+                    break;
+                }
+            }
+        }
+        return color;
     }
 };
 

@@ -7,13 +7,9 @@
 #include "visualisation.h"
 #include "Graph.h"
 
-std::vector<std::vector<int>> adjacencyMatrix = {
-        {0, 1, 0},
-        {1, 0, 1},
-        {0, 1, 0}
-};
+Graph graph(3);
 
-bool weighted = true;
+std::vector<int> colors;
 
 void DrawArrow(ImDrawList* drawList, ImVec2 start, ImVec2 end, ImU32 color,
                float thickness = 1.0f,
@@ -44,12 +40,65 @@ void DrawArrow(ImDrawList* drawList, ImVec2 start, ImVec2 end, ImU32 color,
     }
 }
 
-void DrawGraph(std::vector<std::vector<int>>& adjacencyMatrix, bool weighted) {
-    const int numNodes = adjacencyMatrix.size();
+void CreateGraphInterface(Graph& graph) {
+    ImGui::Begin("Graph Control Panel");
+
+    if (ImGui::Button("Add Vertex")) {
+        graph.addVertex();
+    }
+
+    static int vertexToDelete = -1;
+    ImGui::InputInt("Vertex to delete", &vertexToDelete);
+    if (vertexToDelete >= 1 && vertexToDelete <= graph.vertexCount()) {
+        if (ImGui::Button("Delete Vertex")) {
+            graph.removeVertex(vertexToDelete - 1);
+            vertexToDelete = -1;
+        }
+    }
+
+    static int startVertex = -1;
+    static int endVertex = -1;
+    ImGui::InputInt("Start Vertex", &startVertex);
+    ImGui::InputInt("End Vertex", &endVertex);
+
+    if (startVertex >= 1 && startVertex <= graph.vertexCount() &&
+        endVertex >= 1 && endVertex <= graph.vertexCount()) {
+        if (ImGui::Button("Add Edge")) {
+            graph.addEdge(startVertex - 1, endVertex - 1);
+        }
+    }
+
+    static int edgeStartVertex = -1;
+    static int edgeEndVertex = -1;
+    ImGui::InputInt("Start Edge Vertex", &edgeStartVertex);
+    ImGui::InputInt("End Edge Vertex", &edgeEndVertex);
+
+    if (edgeStartVertex >= 1 && edgeStartVertex <= graph.vertexCount() &&
+        edgeEndVertex >= 1 && edgeEndVertex <= graph.vertexCount()) {
+        if (ImGui::Button("Delete Edge")) {
+            graph.removeEdge(edgeStartVertex - 1, edgeEndVertex - 1);
+        }
+    }
+
+    static int countVertex = -1;
+    static int countEdge = -1;
+    ImGui::Text("Generate new random Graph");
+    ImGui::InputInt("CountVertex", &countVertex);
+    ImGui::InputInt("CountEdge", &countEdge);
+    if (countVertex >= 1 && countEdge >= 0) {
+        if (ImGui::Button("Generate random Graph")) {
+            graph = Graph(countVertex, countEdge);
+        }
+    }
+
+    ImGui::End();
+}
+
+void DrawGraph(Graph& graph) {
+    const int numNodes = graph.vertexCount();
     const float radius = 300.0f;
     const ImVec2 center(500, 400);
     const float nodeRadius = 15.0f;
-
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     std::vector<ImVec2> nodePositions(numNodes);
@@ -59,18 +108,22 @@ void DrawGraph(std::vector<std::vector<int>>& adjacencyMatrix, bool weighted) {
         nodePositions[i] = ImVec2(center.x + radius * cos(angle), center.y + radius * sin(angle));
     }
 
+    std::vector<int> colors = graph.colorGraph();
+
     for (int i = 0; i < numNodes; i++) {
-        drawList->AddCircleFilled(nodePositions[i], nodeRadius, IM_COL32(255, 255, 255, 255));
+        ImU32 nodeColor = IM_COL32(255, 255, 255, 255);
+        if (!colors.empty() && colors[i] >= 0) {
+            nodeColor = IM_COL32(((colors[i] + 1) * 50) % 255, ((colors[i] + 1) * 100) % 255, ((colors[i] + 1) * 150) % 255, 255);
+        }
+        drawList->AddCircleFilled(nodePositions[i], nodeRadius, nodeColor);
     }
 
     for (int i = 0; i < numNodes; i++) {
         for (int j = i + 1; j < numNodes; j++) {
-            if (adjacencyMatrix[i][j] != 0) {
-                DrawArrow(drawList, nodePositions[i], nodePositions[j], IM_COL32(0, 150, 0, 255), 2.0f, 15.0f, weighted,
-                          adjacencyMatrix[i][j]);
+            if (graph.hasEdge(i, j)) {
+                DrawArrow(drawList, nodePositions[i], nodePositions[j], IM_COL32(0, 150, 0, 255), 2.0f, 15.0f, false);
                 if (i != j) {
-                    DrawArrow(drawList, nodePositions[j], nodePositions[i], IM_COL32(0, 150, 0, 255), 2.0f, 15.0f, weighted,
-                              adjacencyMatrix[i][j]);
+                    DrawArrow(drawList, nodePositions[j], nodePositions[i], IM_COL32(0, 150, 0, 255), 2.0f, 15.0f, false);
                 }
             }
         }
@@ -86,67 +139,9 @@ void DrawGraph(std::vector<std::vector<int>>& adjacencyMatrix, bool weighted) {
             y_diff = 15;
             x_diff = 15;
         }
-        drawList->AddText(ImVec2(nodePositions[i].x - x_diff, nodePositions[i].y - y_diff), IM_COL32(0, 0, 0, 255),
-                          label);
+        drawList->AddText(ImVec2(nodePositions[i].x - x_diff, nodePositions[i].y - y_diff), IM_COL32(0, 0, 0, 255), label);
     }
     ImGui::SetWindowFontScale(1.0f);
-}
-
-void CreateGraphInterface(std::vector<std::vector<int>>& adjacencyMatrix) {
-    ImGui::Begin("Graph Control Panel");
-
-    if (ImGui::Button("Add Vertex")) {
-        int newSize = adjacencyMatrix.size() + 1;
-        adjacencyMatrix.resize(newSize, std::vector<int>(newSize, 0));
-
-        for (int i = 0; i < newSize - 1; i++) {
-            adjacencyMatrix[i].push_back(0);
-        }
-    }
-
-    static int vertexToDelete = -1;
-    ImGui::InputInt("Vertex to delete", &vertexToDelete);
-    if (vertexToDelete >= 1 && vertexToDelete <= adjacencyMatrix.size()) {
-        if (ImGui::Button("Delete Vertex")) {
-            int v = vertexToDelete - 1;
-
-            adjacencyMatrix.erase(adjacencyMatrix.begin() + v);
-
-            for (int i = 0; i < adjacencyMatrix.size(); i++) {
-                adjacencyMatrix[i].erase(adjacencyMatrix[i].begin() + v);
-            }
-
-            vertexToDelete = -1;
-        }
-    }
-
-    static int startVertex = -1;
-    static int endVertex = -1;
-    ImGui::InputInt("Start Vertex", &startVertex);
-    ImGui::InputInt("End Vertex", &endVertex);
-
-    if (startVertex >= 1 && startVertex <= adjacencyMatrix.size() &&
-        endVertex >= 1 && endVertex <= adjacencyMatrix.size()) {
-        if (ImGui::Button("Add Edge")) {
-            adjacencyMatrix[startVertex - 1][endVertex - 1] = 1;
-            adjacencyMatrix[endVertex - 1][startVertex - 1] = 1;
-        }
-    }
-
-    static int edgeStartVertex = -1;
-    static int edgeEndVertex = -1;
-    ImGui::InputInt("Start Edge Vertex", &edgeStartVertex);
-    ImGui::InputInt("End Edge Vertex", &edgeEndVertex);
-
-    if (edgeStartVertex >= 1 && edgeStartVertex <= adjacencyMatrix.size() &&
-        edgeEndVertex >= 1 && edgeEndVertex <= adjacencyMatrix.size()) {
-        if (ImGui::Button("Delete Edge")) {
-            adjacencyMatrix[edgeStartVertex - 1][edgeEndVertex - 1] = 0;
-            adjacencyMatrix[edgeEndVertex - 1][edgeStartVertex - 1] = 0;
-        }
-    }
-
-    ImGui::End();
 }
 
 static void glfw_error_callback(int error, const char* description) {
@@ -188,9 +183,9 @@ int visualisation(){
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGui::Begin("Graph Viewer");
-        DrawGraph(adjacencyMatrix, weighted);
+        DrawGraph(graph);
         ImGui::End();
-        CreateGraphInterface(adjacencyMatrix);
+        CreateGraphInterface(graph);
         ImGui::Render();
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
