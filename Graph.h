@@ -44,7 +44,7 @@ public:
     }
 
     void addEdge(int v, int w) {
-        if (v >= V || w >= V || v < 0 || w < 0) return; // Check for valid vertices
+        if (v >= V || w >= V || v < 0 || w < 0) return;
         matrix[v].push_back(w);
         matrix[w].push_back(v);
     }
